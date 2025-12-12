@@ -23,8 +23,12 @@ app.use(cors({
 app.use("/api/inngest", serve({ client: INNGEST, functions,  }));
 
 app.use("/api/posts", postRouter)
-app.get("/", (req, res) => {
-    return res.send("Hello World")
+
+app.get("/check-health", (req, res) => {
+    return res.json({
+        success: true,
+        message: "System is running"
+    })
 })
 
 if (ENV.NODE_ENV == "PROD") {
