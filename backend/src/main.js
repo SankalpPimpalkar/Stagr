@@ -20,7 +20,7 @@ app.use(cors({
 }))
 
 // Routes
-app.use("/api/inngest", serve({ client: INNGEST, functions }));
+app.use("/api/inngest", serve({ client: INNGEST, functions,  }));
 
 app.use("/api/posts", postRouter)
 app.get("/", (req, res) => {

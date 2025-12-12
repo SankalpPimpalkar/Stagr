@@ -2,8 +2,13 @@ import { Inngest } from "inngest";
 import dbconnect from "./db.config.js";
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
+import ENV from "./env.config.js";
 
-export const INNGEST = new Inngest({ id: "my-app" });
+export const INNGEST = new Inngest({
+    id: "my-app",
+    isDev: ENV.NODE_ENV === "DEV",
+
+});
 
 const syncUser = INNGEST.createFunction(
     { id: "sync-user" },
