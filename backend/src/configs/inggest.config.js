@@ -1,7 +1,7 @@
 import { Inngest } from "inngest";
-import dbconnect from "./db.config";
-import User from "../models/user.model";
-import Post from "../models/post.model";
+import dbconnect from "./db.config.js";
+import User from "../models/user.model.js";
+import Post from "../models/post.model.js";
 
 export const INNGEST = new Inngest({ id: "my-app" });
 
