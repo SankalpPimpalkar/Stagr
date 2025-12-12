@@ -24,6 +24,7 @@ const syncUser = INNGEST.createFunction(
             name: `${first_name || ""} ${last_name || ""}` || "User",
             imageUrl: image_url
         }
+        console.log(event.data)
 
         await User.create(newUser)
     }
@@ -38,6 +39,7 @@ const deleteUserFromDB = INNGEST.createFunction(
         const user = await User.findOne({ clerkId: id })
         await Post.deleteMany({ owner: user._id })
         await User.deleteOne({ clerkId: id })
+        console.log("USER", user)
     }
 )
 
