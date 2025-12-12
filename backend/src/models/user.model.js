@@ -22,7 +22,12 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
     bio: {
-        type: String
+        type: String,
+        default: ""
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true })
 
