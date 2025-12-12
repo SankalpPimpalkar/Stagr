@@ -37,8 +37,18 @@ if (ENV.NODE_ENV == "PROD") {
 }
 
 
+
 // Listening
-app.listen(ENV.PORT, () => {
-    dbconnect()
-    console.log(`Server is listening at PORT:`, ENV.PORT)
-})
+async function startServer() {
+    try {
+        await dbconnect()
+        app.listen(ENV.PORT, () => {
+            console.log(`Server is listening at PORT:`, ENV.PORT)
+        })
+    } catch (error) {
+        console.error("Failed to start server:", error)
+        process.exit(1)
+    }
+}
+
+startServer()
