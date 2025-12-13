@@ -1,9 +1,28 @@
 import axios from "axios";
 
 export const AXIOS = axios.create({
-    baseURL: import.meta.env.VITE_SERVER_ENDPOINT,
+    baseURL: import.meta.env.VITE_SERVER_ENDPOINT || "http://localhost:3000/api", // Fallback for dev
     withCredentials: true
 })
+
+// Function to retrieve token - set by the app
+let tokenProvider = null;
+
+export const registerTokenProvider = (provider) => {
+    tokenProvider = provider;
+}
+
+AXIOS.interceptors.request.use(async (config) => {
+    if (tokenProvider) {
+        const token = await tokenProvider();
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
 
 export const userAPI = {
     updateBio: async (bio) => {
@@ -15,12 +34,19 @@ export const userAPI = {
         return data
     },
     checkUsernameAvailability: async (username) => {
-        const { data } = await AXIOS.get(`/users/username/${encodeURIComponent(username)}`)
+        // Backend expects query param: /api/users/username?username=durgesh
+        const { data } = await AXIOS.get(`/users/username`, { params: { username } })
         return data
     },
     getUserByUsername: async (username) => {
-        const { data } = await AXIOS.get(`/users/${encodeURIComponent(username)}`)
-        return data
+        // Backend searchUsers is at /api/users?search=...
+        // We can simulate getByUsername by searching or asking backend dev for a specific route.
+        // For now, let's use search and filter or just search.
+        // If we strictly need by username, we might need to rely on the general search.
+        const { data } = await AXIOS.get("/users", { params: { search: username } })
+        // Assuming the backend returns a list, we pick the exact match if possible
+        const user = data.users.find(u => u.username === username);
+        return user || null;
     },
     getUsers: async (search = "") => {
         const { data } = await AXIOS.get("/users", { params: { search } })
@@ -30,7 +56,11 @@ export const userAPI = {
 
 export const postAPI = {
     createPost: async (formData) => {
-        const { data } = await AXIOS.post("/posts", formData)
+        const { data } = await AXIOS.post("/posts", formData, {
+            headers: {
+                // Axios sets Content-Type to multipart/form-data automatically for FormData
+            }
+        })
         return data
     },
     updatePost: async (postId, formData) => {
@@ -41,8 +71,9 @@ export const postAPI = {
         const { data } = await AXIOS.delete(`/posts/${postId}`)
         return data
     },
-    getAllPosts: async () => {
-        const { data } = await AXIOS.get("/posts")
+    getAllPosts: async (params = {}) => {
+        // params can be { page, limit, tags, keyword, username }
+        const { data } = await AXIOS.get("/posts", { params })
         return data
     },
     toggleLikePost: async (postId) => {
