@@ -7,6 +7,7 @@ import express from "express";
 import path from "path"
 import cors from "cors"
 import postRouter from "./routes/post.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 const app = express()
 const __dirname = path.resolve()
@@ -20,8 +21,9 @@ app.use(cors({
 }))
 
 // Routes
-app.use("/api/inngest", serve({ client: INNGEST, functions,  }));
+app.use("/api/inngest", serve({ client: INNGEST, functions, }));
 
+app.use("/api/users", userRouter)
 app.use("/api/posts", postRouter)
 
 app.get("/check-health", (req, res) => {
