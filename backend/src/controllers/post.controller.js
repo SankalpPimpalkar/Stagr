@@ -1,5 +1,6 @@
 import cloudinary from "../configs/cloudinary.config.js";
 import Post from "../models/post.model.js";
+import User from "../models/user.model.js";
 
 export async function createPost(req, res) {
     try {
@@ -141,53 +142,87 @@ export async function deletePost(req, res) {
 
 export async function getAllPosts(req, res) {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const tags = req.query.tags || [];
-        const keyword = (req.query.keyword || "").trim();
-        const skipIndex = (page - 1) * limit;
-        const filterQuery = {}
+        const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+        const limit = Math.min(
+            Math.max(parseInt(req.query.limit, 10) || 10, 1),
+            50
+        );
+        const skip = (page - 1) * limit;
 
-        if (Array.isArray(tags) && tags.length > 0) {
-            filterQuery.tags = { $in: tags }
-        }
+        const filterQuery = {};
 
-        if (keyword) {
-            filterQuery.description = {
-                $regex: keyword,
-                $options: 'i'
+        let tags = [];
+        if (req.query.tags) {
+            if (Array.isArray(req.query.tags)) {
+                tags = req.query.tags;
+            } else if (typeof req.query.tags === "string") {
+                tags = req.query.tags.split(",").map(t => t.trim());
+            }
+
+            if (tags.length > 0) {
+                filterQuery.tags = { $in: tags };
             }
         }
 
-        const posts = await Post.find(filterQuery)
-            .sort({ createdAt: -1 })
-            .skip(skipIndex)
-            .limit(limit)
-            .exec()
+        const keyword = typeof req.query.keyword === "string"
+            ? req.query.keyword.trim()
+            : "";
 
-        const totalPosts = await Post.countDocuments(filterQuery)
-        const totalPages = Math.ceil(totalPosts / limit)
+        if (keyword.length > 0 && keyword.length <= 50) {
+            const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            filterQuery.description = {
+                $regex: escapedKeyword,
+                $options: "i"
+            };
+        }
 
-        return res
-            .status(200)
-            .json({
-                message: "Fetched Posts",
-                totalPages,
-                totalPosts,
-                posts,
-                page,
-                limit,
-                tags,
-                keyword
-            })
+        if (typeof req.query.username === "string") {
+            const username = req.query.username.trim().toLowerCase();
+            if (username.length > 0) {
+                const owner = await User.findOne({ username }).select("_id").lean();
+                if (!owner) {
+                    return res.status(200).json({
+                        message: "Fetched posts",
+                        page,
+                        limit,
+                        totalPages: 0,
+                        totalPosts: 0,
+                        posts: []
+                    });
+                }
+                filterQuery.owner = owner._id;
+            }
+        }
 
-    } catch (error) {
-        console.error("Error in Getting Posts", error)
-        return res
-            .status(500)
-            .json({ message: "Internal Server Error" })
+        const [posts, totalPosts] = await Promise.all([
+            Post.find(filterQuery)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate("owner", "name username imageUrl")
+                .select("description owner images tags createdAt updatedAt")
+                .lean()
+                .exec(),
+            Post.countDocuments(filterQuery)
+        ]);
+
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        return res.status(200).json({
+            message: "Fetched posts",
+            page,
+            limit,
+            totalPages,
+            totalPosts,
+            posts
+        });
+
+    } catch (err) {
+        console.error("Error fetching posts:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
 
 export async function toggleLikePost(req, res) {
     try {
