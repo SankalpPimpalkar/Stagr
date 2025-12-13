@@ -9,7 +9,7 @@ export default function Feed() {
     })
     const posts = postsData?.posts || []
 
-    if (!isLoading) return <span className="loading-bars loading-xl" />
+    if (isLoading) return <span className="loading-bars loading-xl" />
 
     return (
         <div className="w-full h-screen flex items-center justify-center">

@@ -15,7 +15,7 @@ export const userAPI = {
         return data
     },
     checkUsernameAvailability: async (username) => {
-        const { data } = AXIOS.get(`/users/username/${encodeURIComponent(username)}`)
+        const { data } = await AXIOS.get(`/users/username/${encodeURIComponent(username)}`)
         return data
     },
     getUserByUsername: async (username) => {
