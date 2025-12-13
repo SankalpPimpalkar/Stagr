@@ -8,7 +8,8 @@
   "main": "main.js",
   "scripts": {
     "dev": "node --watch src/main.js",
-    "start": "node src/main.js"
+    "start": "node src/main.js",
+    "seed": "node src/seed.js"
   },
   "dependencies": {
     "@clerk/express": "^1.7.57",
@@ -16,8 +17,12 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "faker": "^6.6.6",
     "inngest": "^3.47.0",
     "mongoose": "^9.0.1",
     "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.1.0"
   }
 }
