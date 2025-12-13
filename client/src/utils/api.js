@@ -8,7 +8,7 @@ export const AXIOS = axios.create({
 export const userAPI = {
     updateBio: async () => { },
     getUseByUsername: async (username) => { },
-    getRecommendedUsers: async (username) => { },
+    getUsers: async (username) => { },
 }
 
 export const postAPI = {
