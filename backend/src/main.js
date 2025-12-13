@@ -19,6 +19,7 @@ app.use(cors({
     origin: ENV.CLIENT_URL,
     credentials: true
 }))
+console.log(ENV)
 
 // Routes
 app.use("/api/inngest", serve({ client: INNGEST, functions, }));

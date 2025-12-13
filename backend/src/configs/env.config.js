@@ -5,7 +5,8 @@ const ENV = {
     NODE_ENV: process.env.NODE_ENV,
     PORT: process.env.PORT,
     DB_URL: process.env.DB_URL,
-    INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY
+    INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
+    CLIENT_URL: process.env.CLIENT_URL,
 }
 
 export default ENV
