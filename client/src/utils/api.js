@@ -6,16 +6,47 @@ export const AXIOS = axios.create({
 })
 
 export const userAPI = {
-    updateBio: async () => { },
-    getUseByUsername: async (username) => { },
-    getUsers: async (username) => { },
+    updateBio: async (bio) => {
+        const { data } = await AXIOS.patch("/users/bio", { bio })
+        return data
+    },
+    updateUsername: async (username) => {
+        const { data } = await AXIOS.patch("/users/username", { username })
+        return data
+    },
+    checkUsernameAvailability: async (username) => {
+        const { data } = await AXIOS.get(`/users/username/${encodeURIComponent(username)}`)
+        return data
+    },
+    getUserByUsername: async (username) => {
+        const { data } = await AXIOS.get(`/users/${encodeURIComponent(username)}`)
+        return data
+    },
+    getUsers: async (search = "") => {
+        const { data } = await AXIOS.get("/users", { params: { search } })
+        return data
+    },
 }
 
 export const postAPI = {
-    createPost: async () => { },
-    updatePost: async (postId) => { },
-    deletePost: async (postId) => { },
-    getAllPosts: async () => { },
-    getSuggestedPosts: async () => { },
-    toggleLikePost: async (postId) => { },
+    createPost: async (formData) => {
+        const { data } = await AXIOS.post("/posts", formData)
+        return data
+    },
+    updatePost: async (postId, formData) => {
+        const { data } = await AXIOS.put(`/posts/${postId}`, formData)
+        return data
+    },
+    deletePost: async (postId) => {
+        const { data } = await AXIOS.delete(`/posts/${postId}`)
+        return data
+    },
+    getAllPosts: async () => {
+        const { data } = await AXIOS.get("/posts")
+        return data
+    },
+    toggleLikePost: async (postId) => {
+        const { data } = await AXIOS.patch(`/posts/${postId}`)
+        return data
+    },
 }
