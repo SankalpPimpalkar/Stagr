@@ -2,13 +2,13 @@ import User from "../models/user.model.js"
 
 export async function checkUsernameAvailability(req, res) {
     try {
-        const { username } = req.params
+        const username = (req.query.username || "").trim().toLowerCase()
 
         const existingUsername = await User.countDocuments({ username })
 
         return res
             .status(200)
-            .json({ message: "Fetched Username Availability", isAvailable: Boolean(existingUsername) })
+            .json({ message: "Fetched Username Availability", isAvailable: existingUsername === 0 })
 
     } catch (error) {
         console.error("Error in Getting Username Availability Status", error)

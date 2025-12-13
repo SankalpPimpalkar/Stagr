@@ -116,7 +116,7 @@ export async function deletePost(req, res) {
         if (post.owner._id.toString() !== user._id.toString()) {
             return res
                 .status(401)
-                .json({ message: "You are not authorized to edit this post" })
+                .json({ message: "You are not authorized to delete this post" })
         }
 
         const deletePromises = post.images.map(imageUrl => {
@@ -144,7 +144,7 @@ export async function getAllPosts(req, res) {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const tags = req.query.tags || [];
-        const keyword = req.query.keyword.trim() || "";
+        const keyword = (req.query.keyword || "").trim();
         const skipIndex = (page - 1) * limit;
         const filterQuery = {}
 
@@ -165,7 +165,7 @@ export async function getAllPosts(req, res) {
             .limit(limit)
             .exec()
 
-        const totalPosts = await Post.countDocuments({})
+        const totalPosts = await Post.countDocuments(filterQuery)
         const totalPages = Math.ceil(totalPosts / limit)
 
         return res

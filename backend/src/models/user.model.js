@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
     },
     username: {
         type: String,
-        unique: true
+        unique: true,
+        trim: true,
+        lowercase: true,
     },
     email: {
         type: String,
@@ -31,6 +33,11 @@ const userSchema = new mongoose.Schema({
         default: false
     }
 }, { timestamps: true })
+
+userSchema.index(
+    { username: 1 },
+    { unique: true, partialFilterExpression: { isDeleted: false, username: { $type: "string" } } }
+)
 
 const User = mongoose.model("User", userSchema);
 export default User;
