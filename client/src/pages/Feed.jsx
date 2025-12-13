@@ -1,16 +1,35 @@
-import { useUser } from "@clerk/clerk-react"
+import { useQuery } from "@tanstack/react-query"
+import { postAPI } from "../utils/api"
 
 export default function Feed() {
 
-    const { user, isLoaded } = useUser()
+    const { data: postsData, isLoading } = useQuery({
+        queryKey: ["posts"],
+        queryFn: postAPI.getAllPosts
+    })
+    const posts = postsData?.posts || []
 
-    if (!isLoaded) return <span className="loading-bars loading-xl" />
+    if (!isLoading) return <span className="loading-bars loading-xl" />
 
     return (
         <div className="w-full h-screen flex items-center justify-center">
-            <h5 className="font-semibold text-lg text-base-content/70">
-                Hello {user.fullName}
-            </h5>
+            {
+                posts?.length === 0 ? (
+                    <p className="text-base-200 font-semibold text-sm">
+                        There are no posts yet
+                    </p>
+                ) : (
+                    <ul>
+                        {
+                            posts?.map(post => (
+                                <li key={post._id}>
+                                    {post.description}
+                                </li>
+                            ))
+                        }
+                    </ul>
+                )
+            }
         </div>
     )
 }
