@@ -1,5 +1,6 @@
 import cloudinary from "../configs/cloudinary.config.js";
 import Post from "../models/post.model.js";
+import User from "../models/user.model.js";
 
 export async function createPost(req, res) {
     try {
@@ -144,7 +145,7 @@ export async function getAllPosts(req, res) {
         const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
         const limit = Math.min(
             Math.max(parseInt(req.query.limit, 10) || 10, 1),
-            50 
+            50
         );
         const skip = (page - 1) * limit;
 
@@ -178,7 +179,18 @@ export async function getAllPosts(req, res) {
         if (typeof req.query.username === "string") {
             const username = req.query.username.trim().toLowerCase();
             if (username.length > 0) {
-                filterQuery.username = username;
+                const owner = await User.findOne({ username }).select("_id").lean();
+                if (!owner) {
+                    return res.status(200).json({
+                        message: "Fetched posts",
+                        page,
+                        limit,
+                        totalPages: 0,
+                        totalPosts: 0,
+                        posts: []
+                    });
+                }
+                filterQuery.owner = owner._id;
             }
         }
 
@@ -188,7 +200,7 @@ export async function getAllPosts(req, res) {
                 .skip(skip)
                 .limit(limit)
                 .populate("owner", "name username imageUrl")
-                .select("description images tags createdAt updatedAt")
+                .select("description owner images tags createdAt updatedAt")
                 .lean()
                 .exec(),
             Post.countDocuments(filterQuery)
