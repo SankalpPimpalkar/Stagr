@@ -77,7 +77,66 @@ export const postAPI = {
         return data
     },
     toggleLikePost: async (postId) => {
-        const { data } = await AXIOS.patch(`/posts/${postId}`)
+        const { data } = await AXIOS.post(`/posts/${postId}`)
         return data
     },
 }
+
+export const storyAPI = {
+    createStory: async (formData) => {
+        // formData: title, content, coverImage
+        const { data } = await AXIOS.post("/stories", formData);
+        return data;
+    },
+
+    updateStory: async (storyId, formData) => {
+        const { data } = await AXIOS.patch(`/stories/${storyId}`, formData);
+        return data;
+    },
+
+    deleteStory: async (storyId) => {
+        const { data } = await AXIOS.delete(`/stories/${storyId}`);
+        return data;
+    },
+
+    getAllStories: async (params = {}) => {
+        // params: { page, limit, username }
+        const { data } = await AXIOS.get("/stories", { params });
+        return data;
+    },
+
+    toggleLikeStory: async (storyId) => {
+        const { data } = await AXIOS.post(`/stories/${storyId}/like`);
+        return data;
+    },
+};
+
+export const tagAPI = {
+    createTag: async ({ storyId, content }) => {
+        const { data } = await AXIOS.post("/tags", {
+            storyId,
+            content
+        });
+        return data;
+    },
+
+    updateTag: async (tagId, content) => {
+        const { data } = await AXIOS.patch(`/tags/${tagId}`, { content });
+        return data;
+    },
+
+    deleteTag: async (tagId) => {
+        const { data } = await AXIOS.delete(`/tags/${tagId}`);
+        return data;
+    },
+
+    getTagsByStory: async (storyId) => {
+        const { data } = await AXIOS.get(`/tags/story/${storyId}`);
+        return data;
+    },
+
+    toggleLikeTag: async (tagId) => {
+        const { data } = await AXIOS.post(`/tags/${tagId}/like`);
+        return data;
+    },
+};
