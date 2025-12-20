@@ -9,6 +9,6 @@ postRouter.get("/", protectRoute, getAllPosts)
 postRouter.post("/", protectRoute, upload.array("images"), createPost)
 postRouter.delete("/:postId", protectRoute, deletePost)
 postRouter.put("/:postId", protectRoute, upload.array("images"), editPost)
-postRouter.patch("/:postId", protectRoute, toggleLikePost)
+postRouter.post("/:postId", protectRoute, toggleLikePost)
 
 export default postRouter
