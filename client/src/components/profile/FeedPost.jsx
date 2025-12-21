@@ -3,7 +3,7 @@ import { Button } from "../ui/Button";
 import { ImageCarousel } from "../ui/ImageCarousel";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postAPI } from "../../utils/api";
-import { useUser } from "@clerk/clerk-react";
+import { useCurrentUser } from "../../hooks/user";
 
 // Helper to format date
 const formatDate = (dateString) => {
@@ -15,13 +15,13 @@ const formatDate = (dateString) => {
 };
 
 export function FeedPost({ post }) {
-    const { user } = useUser();
+    const currentUser = useCurrentUser();
+    const user = currentUser?.data?.user;
     const queryClient = useQueryClient();
 
     // Check if liked using current user ID (needs auth context fix for ObjectId vs ClerkId ideally)
     // For now, trusting the array contains something we can match, or just optimistic toggle.
-    const isLiked = post.likes?.includes(user?.id);
-
+    const isLiked = post.likes?.includes(user?._id);
     const likeMutation = useMutation({
         mutationFn: () => postAPI.toggleLikePost(post._id),
         onSuccess: () => {
