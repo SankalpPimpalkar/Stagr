@@ -1,28 +1,23 @@
 import { useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUser } from "@clerk/clerk-react";
 import { userAPI, postAPI } from "../utils/api";
-import { PostCard } from "../components/PostCard";
-import { Avatar } from "../components/ui/Avatar";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
 import { Modal } from "../components/ui/Modal";
 import { Input } from "../components/ui/Input";
+import { Button } from "../components/ui/Button";
 import { useState } from "react";
+import { useCurrentUser } from "../hooks/user";
+import { ProfileHeader } from "../components/profile/ProfileHeader";
+import { PostGrid } from "../components/profile/PostGrid";
+import { PostFeedOverlay } from "../components/profile/PostFeedOverlay";
 
 export default function Profile() {
     const { username } = useParams();
-    const { user: currentUser } = useUser();
     const queryClient = useQueryClient();
     const [isEditBioOpen, setIsEditBioOpen] = useState(false);
     const [bio, setBio] = useState("");
+    const { user: currentUser } = useCurrentUser();
 
-    // Fetch User Details
-    const { data: userProfile, isLoading: isUserLoading } = useQuery({
-        queryKey: ["user", username],
-        queryFn: () => userAPI.getUserByUsername(username),
-        enabled: !!username
-    });
+    const [selectedIndex, setSelectedIndex] = useState(null);
 
     // Fetch User Posts
     const { data: postsData, isLoading: isPostsLoading } = useQuery({
@@ -34,74 +29,73 @@ export default function Profile() {
     const updateBioMutation = useMutation({
         mutationFn: (newBio) => userAPI.updateBio(newBio),
         onSuccess: () => {
-            queryClient.invalidateQueries(["user", username]);
+            queryClient.invalidateQueries(["currentUser"]);
             setIsEditBioOpen(false);
         }
     });
 
     const posts = postsData?.posts || [];
-
-    // Check if viewing own profile
-    // We match by username as it's visible in URL and profile
     const isOwnProfile = currentUser?.username === username;
 
-    if (isUserLoading) return (
-        <div className="flex justify-center mt-20">
-            <span className="loading loading-bars loading-lg text-primary"></span>
-        </div>
-    );
-
-    if (!userProfile) return (
-        <div className="text-center mt-20">
-            <h1 className="text-2xl font-bold">User not found</h1>
+    if (!currentUser) return (
+        <div className="flex justify-center items-center h-[50vh]">
+            <span className="loading loading-spinner loading-lg text-primary"></span>
         </div>
     );
 
     return (
-        <div className="max-w-2xl mx-auto py-8">
-            {/* Profile Header */}
-            <Card className="mb-8 text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-r from-primary/20 to-secondary/20 z-0"></div>
-                <div className="relative z-10 pt-10">
-                    <div className="inline-block p-1 bg-base-100 rounded-full mb-4">
-                        <Avatar src={userProfile.imageUrl} alt={userProfile.username} size="xl" />
-                    </div>
-                    <h1 className="text-3xl font-bold">{userProfile.name}</h1>
-                    <p className="opacity-70 text-lg">@{userProfile.username}</p>
+        <div className="max-w-4xl mx-auto py-8">
+            <ProfileHeader
+                user={currentUser}
+                isOwnProfile={isOwnProfile}
+                onEditProfile={() => {
+                    setBio(currentUser.bio || "");
+                    setIsEditBioOpen(true);
+                }}
+                postCount={posts.length}
+            />
 
-                    <div className="mt-4 px-8">
-                        <p className="text-base-content/80 whitespace-pre-wrap">{userProfile.bio || "No bio yet."}</p>
-                    </div>
+            <div className="border-t border-base-content/10 mt-8 mb-8" />
 
-                    {isOwnProfile && (
-                        <div className="mt-6 mb-2">
-                            <Button variant="outline" size="sm" onClick={() => {
-                                setBio(userProfile.bio || "");
-                                setIsEditBioOpen(true);
-                            }}>
-                                Edit Profile
-                            </Button>
-                        </div>
-                    )}
-                </div>
-            </Card>
-
-            <h2 className="text-2xl font-bold mb-4 px-2 border-b border-base-content/10 pb-2">Posts</h2>
+            <div className="mb-6 flex justify-center gap-12 text-sm font-semibold tracking-wide uppercase">
+                <span className="flex items-center gap-2 border-t border-base-content pt-4 -mt-4.5 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                    </svg>
+                    Posts
+                </span>
+                <span className="flex items-center gap-2 pt-4 opacity-40 cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                    </svg>
+                    Saved
+                </span>
+                <span className="flex items-center gap-2 pt-4 opacity-40 cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                    Tagged
+                </span>
+            </div>
 
             {isPostsLoading ? (
-                <div className="flex justify-center py-10">
+                <div className="flex justify-center py-20">
                     <span className="loading loading-spinner text-primary"></span>
                 </div>
             ) : (
-                <div className="space-y-6">
-                    {posts.length === 0 ? (
-                        <p className="text-center opacity-50 py-10">No posts shared yet.</p>
-                    ) : (
-                        posts.map(post => (
-                            <PostCard key={post._id} post={post} />
-                        ))
-                    )}
-                </div>
+                <PostGrid
+                    posts={posts}
+                    onPostClick={(index) => setSelectedIndex(index)}
+                />
+            )}
+
+            {/* Post Feed Overlay */}
+            {selectedIndex !== null && (
+                <PostFeedOverlay
+                    posts={posts}
+                    initialIndex={selectedIndex}
+                    onClose={() => setSelectedIndex(null)}
+                />
             )}
 
             {/* Edit Bio Modal */}
@@ -116,6 +110,8 @@ export default function Profile() {
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
                         placeholder="Tell us about yourself"
+                        multiline
+                        rows={3}
                     />
                     <div className="flex justify-end gap-2 mt-6">
                         <Button variant="ghost" onClick={() => setIsEditBioOpen(false)}>Cancel</Button>
@@ -124,7 +120,7 @@ export default function Profile() {
                             onClick={() => updateBioMutation.mutate(bio)}
                             isLoading={updateBioMutation.isPending}
                         >
-                            Save
+                            Save Profile
                         </Button>
                     </div>
                 </div>

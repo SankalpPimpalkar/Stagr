@@ -200,7 +200,7 @@ export async function getAllPosts(req, res) {
                 .skip(skip)
                 .limit(limit)
                 .populate("owner", "name username imageUrl")
-                .select("description owner images tags likes createdAt updatedAt")
+                .select("description owner likes images tags createdAt updatedAt")
                 .lean()
                 .exec(),
             Post.countDocuments(filterQuery)
