@@ -18,6 +18,7 @@ const formatDate = (dateString) => {
 
 export function PostCard({ post }) {
     const { user } = useUser();
+    console.log(post, 'post')
     const queryClient = useQueryClient();
     const isOwner = user?.id === post.owner?.clerkId; // Assuming backend populates clerkId or we match another way. 
     // Backend `protectRoute` matches clerkId to find user, then req.user is mongo user. 
@@ -80,8 +81,8 @@ export function PostCard({ post }) {
             )}
 
             <div className="flex gap-2 mt-4">
-                {post.tags?.map(tag => (
-                    <span key={tag} className="badge badge-primary badge-outline text-xs">#{tag}</span>
+                {post.tags?.map((tag, index) => (
+                    <span key={`${tag}-${index}`} className="badge badge-primary badge-outline text-xs">#{tag}</span>
                 ))}
             </div>
 
@@ -90,7 +91,7 @@ export function PostCard({ post }) {
                     variant="ghost"
                     size="sm"
                     className={isLiked ? "text-red-500" : ""}
-                    onClick={() => likeMutation.mutate()}
+                    onClick={() => likeMutation.mutate(post._id)}
                     isLoading={likeMutation.isPending}
                 >
                     ♥ Like {post.likes?.length || 0}
