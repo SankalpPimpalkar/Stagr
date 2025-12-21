@@ -95,3 +95,46 @@ export async function searchUsers(req, res) {
             .json({ message: "Internal Server Error" })
     }
 }
+
+export async function getCurrentUser(req, res) {
+    try {
+        const user = req.user
+
+        return res
+            .status(200)
+            .json({ message: "Current User Fetched", user })
+
+    } catch (error) {
+        console.error("Error in Getting Current User", error)
+        return res
+            .status(500)
+            .json({ message: "Internal Server Error" })
+    }
+}
+
+export async function getUserByUsername(req, res) {
+    try {
+        const { username } = req.params
+
+        if (!username) {
+            return res
+                .status(400)
+                .json({
+                    message: "Username is required"
+                })
+        }
+
+        const user = await User.findOne({ username: regex })
+            .select("name username imageUrl bio createdAt")
+
+        return res
+            .status(200)
+            .json({ message: "User by Username Fetched", user })
+
+    } catch (error) {
+        console.error("Error in Getting User by Username", error)
+        return res
+            .status(500)
+            .json({ message: "Internal Server Error" })
+    }
+}

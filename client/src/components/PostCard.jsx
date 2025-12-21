@@ -80,8 +80,8 @@ export function PostCard({ post }) {
             )}
 
             <div className="flex gap-2 mt-4">
-                {post.tags?.map(tag => (
-                    <span key={tag} className="badge badge-primary badge-outline text-xs">#{tag}</span>
+                {post.tags?.map((tag, idx) => (
+                    <span key={idx} className="badge badge-primary badge-outline text-xs">#{tag}</span>
                 ))}
             </div>
 

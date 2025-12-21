@@ -9,6 +9,7 @@ export default function Feed() {
         queryFn: () => postAPI.getAllPosts(),
     })
     const posts = postsData?.posts || []
+    console.log(posts)
 
     if (isLoading) return (
         <div className="flex justify-center mt-20">
