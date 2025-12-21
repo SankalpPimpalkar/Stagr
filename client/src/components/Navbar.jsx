@@ -1,16 +1,11 @@
 import { Link, NavLink, useNavigate } from "react-router";
 import { UserButton, useUser, useClerk } from "@clerk/clerk-react";
 import { Button } from "./ui/Button";
-import { useQuery } from "@tanstack/react-query";
-import { userAPI } from "../utils/api";
+import { useCurrentUser } from "../hooks/user";
 
 export function Navbar() {
-    const { data: userData } = useQuery({
-        queryKey: ["currentUser"],
-        queryFn: () => userAPI.getCurrentUser(),
-        retry: false
-    })
-    console.log(userData?.user, 'Myuserss')
+    const { user: currentUser } = useCurrentUser();
+    console.log(currentUser, 'Myuserss')
     const navigate = useNavigate();
 
     return (
@@ -43,11 +38,11 @@ export function Navbar() {
                 >
                     +
                 </button>
-                {(userData?.user?.username) && (
-                    <NavLink to={`/profile/${userData?.user?.username}`} className={({ isActive }) => `btn btn-sm btn-ghost ${isActive ? "bg-base-200" : ""}`}>Profile</NavLink>
+                {(currentUser?.username) && (
+                    <NavLink to={`/profile/${currentUser?.username}`} className={({ isActive }) => `btn btn-sm btn-ghost ${isActive ? "bg-base-200" : ""}`}>Profile</NavLink>
                 )}
                 {/* <UserButton afterSignOutUrl="/sign-in" /> */}
-            </div> 
+            </div>
         </nav>
     );
 }

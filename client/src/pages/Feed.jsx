@@ -1,7 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { postAPI, userAPI } from "../utils/api"
+import { postAPI } from "../utils/api"
 import { PostCard } from "../components/PostCard"
 import { SetUsernameModal } from "../components/user/SetUsernameModal"
+import { useCurrentUser } from "../hooks/user"
 
 export default function Feed() {
     const queryClient = useQueryClient();
@@ -11,13 +12,9 @@ export default function Feed() {
         queryFn: () => postAPI.getAllPosts(),
     })
 
-    const { data: userData } = useQuery({
-        queryKey: ["currentUser"],
-        queryFn: () => userAPI.getCurrentUser(),
-        retry: false
-    })
+    const { user: currentUser } = useCurrentUser();
+
     const posts = postsData?.posts || []
-    const currentUser = userData?.user;
     const shouldShowUsernameModal = currentUser && !currentUser.username;
     console.log(currentUser, shouldShowUsernameModal, "userData")
 

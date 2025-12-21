@@ -9,20 +9,14 @@ import { Card } from "../components/ui/Card";
 import { Modal } from "../components/ui/Modal";
 import { Input } from "../components/ui/Input";
 import { useState } from "react";
+import { useCurrentUser } from "../hooks/user";
 
 export default function Profile() {
     const { username } = useParams();
-    const { user: currentUser } = useUser();
     const queryClient = useQueryClient();
     const [isEditBioOpen, setIsEditBioOpen] = useState(false);
     const [bio, setBio] = useState("");
-
-    // Fetch User Details
-    const { data: userProfile, isLoading: isUserLoading } = useQuery({
-        queryKey: ["user", username],
-        queryFn: () => userAPI.getUserByUsername(username),
-        enabled: !!username
-    });
+    const { user: currentUser } = useCurrentUser();
 
     // Fetch User Posts
     const { data: postsData, isLoading: isPostsLoading } = useQuery({
@@ -40,18 +34,15 @@ export default function Profile() {
     });
 
     const posts = postsData?.posts || [];
-
-    // Check if viewing own profile
-    // We match by username as it's visible in URL and profile
     const isOwnProfile = currentUser?.username === username;
 
-    if (isUserLoading) return (
+    if (isPostsLoading) return (
         <div className="flex justify-center mt-20">
             <span className="loading loading-bars loading-lg text-primary"></span>
         </div>
     );
 
-    if (!userProfile) return (
+    if (!currentUser) return (
         <div className="text-center mt-20">
             <h1 className="text-2xl font-bold">User not found</h1>
         </div>
@@ -59,24 +50,23 @@ export default function Profile() {
 
     return (
         <div className="max-w-2xl mx-auto py-8">
-            {/* Profile Header */}
             <Card className="mb-8 text-center relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-r from-primary/20 to-secondary/20 z-0"></div>
                 <div className="relative z-10 pt-10">
                     <div className="inline-block p-1 bg-base-100 rounded-full mb-4">
-                        <Avatar src={userProfile.imageUrl} alt={userProfile.username} size="xl" />
+                        <Avatar src={currentUser.imageUrl} alt={currentUser.username} size="xl" />
                     </div>
-                    <h1 className="text-3xl font-bold">{userProfile.name}</h1>
-                    <p className="opacity-70 text-lg">@{userProfile.username}</p>
+                    <h1 className="text-3xl font-bold">{currentUser.name}</h1>
+                    <p className="opacity-70 text-lg">@{currentUser.username}</p>
 
                     <div className="mt-4 px-8">
-                        <p className="text-base-content/80 whitespace-pre-wrap">{userProfile.bio || "No bio yet."}</p>
+                        <p className="text-base-content/80 whitespace-pre-wrap">{currentUser.bio || "No bio yet."}</p>
                     </div>
 
                     {isOwnProfile && (
                         <div className="mt-6 mb-2">
                             <Button variant="outline" size="sm" onClick={() => {
-                                setBio(userProfile.bio || "");
+                                setBio(currentUser.bio || "");
                                 setIsEditBioOpen(true);
                             }}>
                                 Edit Profile
