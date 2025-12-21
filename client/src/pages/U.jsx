@@ -4,6 +4,8 @@ import { useUser } from "@clerk/clerk-react";
 import { userAPI, postAPI } from "../utils/api";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { PostGrid } from "../components/profile/PostGrid";
+import { PostFeedOverlay } from "../components/profile/PostFeedOverlay";
+import { useState } from "react";
 
 export default function U() {
     const { username } = useParams();
@@ -24,6 +26,7 @@ export default function U() {
     });
 
     const posts = postsData?.posts || [];
+    const [selectedIndex, setSelectedIndex] = useState(null);
 
     // Check if viewing own profile
     // We match by username as it's visible in URL and profile
@@ -70,7 +73,19 @@ export default function U() {
                     <span className="loading loading-spinner text-primary"></span>
                 </div>
             ) : (
-                <PostGrid posts={posts} />
+                <PostGrid
+                    posts={posts}
+                    onPostClick={(index) => setSelectedIndex(index)}
+                />
+            )}
+
+            {/* Post Feed Overlay */}
+            {selectedIndex !== null && (
+                <PostFeedOverlay
+                    posts={posts}
+                    initialIndex={selectedIndex}
+                    onClose={() => setSelectedIndex(null)}
+                />
             )}
         </div>
     );

@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useCurrentUser } from "../hooks/user";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { PostGrid } from "../components/profile/PostGrid";
+import { PostFeedOverlay } from "../components/profile/PostFeedOverlay";
 
 export default function Profile() {
     const { username } = useParams();
@@ -15,6 +16,8 @@ export default function Profile() {
     const [isEditBioOpen, setIsEditBioOpen] = useState(false);
     const [bio, setBio] = useState("");
     const { user: currentUser } = useCurrentUser();
+
+    const [selectedIndex, setSelectedIndex] = useState(null);
 
     // Fetch User Posts
     const { data: postsData, isLoading: isPostsLoading } = useQuery({
@@ -80,7 +83,19 @@ export default function Profile() {
                     <span className="loading loading-spinner text-primary"></span>
                 </div>
             ) : (
-                <PostGrid posts={posts} />
+                <PostGrid
+                    posts={posts}
+                    onPostClick={(index) => setSelectedIndex(index)}
+                />
+            )}
+
+            {/* Post Feed Overlay */}
+            {selectedIndex !== null && (
+                <PostFeedOverlay
+                    posts={posts}
+                    initialIndex={selectedIndex}
+                    onClose={() => setSelectedIndex(null)}
+                />
             )}
 
             {/* Edit Bio Modal */}

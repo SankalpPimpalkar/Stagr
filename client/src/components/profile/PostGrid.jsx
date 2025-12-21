@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 
-export function PostGrid({ posts }) {
+export function PostGrid({ posts, onPostClick }) {
     if (!posts || posts.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-32 opacity-60 animate-in fade-in zoom-in duration-700">
@@ -17,19 +17,24 @@ export function PostGrid({ posts }) {
 
     return (
         <div className="grid grid-cols-3 gap-1 md:gap-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {posts.map((post) => (
-                <PostGridItem key={post._id} post={post} />
+            {posts.map((post, index) => (
+                <PostGridItem
+                    key={post._id}
+                    post={post}
+                    onClick={() => onPostClick && onPostClick(index)}
+                />
             ))}
         </div>
     );
 }
 
-function PostGridItem({ post }) {
+function PostGridItem({ post, onClick }) {
     const hasImage = post.images && post.images.length > 0;
 
     return (
         <div
             className="aspect-square relative group cursor-pointer bg-base-200 overflow-hidden rounded-md md:rounded-3xl shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+            onClick={onClick}
         >
             {hasImage ? (
                 <img
