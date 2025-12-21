@@ -11,7 +11,7 @@ import Explore from "./pages/Explore"
 import NotFound from "./pages/NotFound"
 import CreatePost from "./pages/CreatePost"
 import { Navbar } from "./components/Navbar"
-import U from "./pages/u"
+import U from "./pages/U"
 
 export default function App() {
   const { getToken } = useAuth();
