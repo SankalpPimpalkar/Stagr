@@ -51,13 +51,16 @@ export default function App() {
   )
 }
 
+import { BottomNav } from "./components/nav/BottomNav"
+
 function Layout() {
   return (
-    <div className="min-h-screen bg-base-100 text-base-content antialiased">
+    <div className="min-h-screen bg-base-100 text-base-content antialiased pb-16 md:pb-0">
       <Navbar />
-      <div className="container mx-auto p-4 max-w-2xl">
+      <div className="container mx-auto p-4 max-w-2xl pt-20">
         <Outlet />
       </div>
+      <BottomNav />
     </div>
   )
 }
