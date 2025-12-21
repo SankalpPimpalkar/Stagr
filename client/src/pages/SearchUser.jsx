@@ -27,7 +27,7 @@ export default function SearchUser() {
     });
 
     const users = usersData?.users || [];
-
+    console.log(users, 'users')
     return (
         <div className="max-w-xl mx-auto py-8">
             <h1 className="text-3xl font-bold mb-6 text-center bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">Find People</h1>

@@ -11,6 +11,7 @@ import Explore from "./pages/Explore"
 import NotFound from "./pages/NotFound"
 import CreatePost from "./pages/CreatePost"
 import { Navbar } from "./components/Navbar"
+import U from "./pages/u"
 
 export default function App() {
   const { getToken } = useAuth();
@@ -38,6 +39,7 @@ export default function App() {
           <Route index element={<Feed />} />
           <Route path="users" element={<SearchUser />} />
           <Route path="profile/:username" element={<Profile />} />
+          <Route path="U/:username" element={<U />} />
           <Route path="settings" element={<Settings />} />
           <Route path="explore" element={<Explore />} />
           <Route path="create-post" element={<CreatePost />} />

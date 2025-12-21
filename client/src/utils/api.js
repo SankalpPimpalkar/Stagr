@@ -48,6 +48,10 @@ export const userAPI = {
         const user = data.users.find(u => u.username === username);
         return user || null;
     },
+    getCurrentUser: async () => {
+        const { data } = await AXIOS.get("/users/me")
+        return data
+    },
     getUsers: async (search = "") => {
         const { data } = await AXIOS.get("/users", { params: { search } })
         return data

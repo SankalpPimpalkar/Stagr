@@ -10,7 +10,7 @@ export function UserCard({ user }) {
         <Card className="flex items-center justify-between p-4 hover:bg-base-200/50 transition-colors">
             <div
                 className="flex items-center gap-3 cursor-pointer"
-                onClick={() => navigate(`/profile/${user.username}`)}
+                onClick={() => navigate(`/U/${user.username}`)}
             >
                 <Avatar src={user.imageUrl} alt={user.username} size="md" />
                 <div>
@@ -22,7 +22,7 @@ export function UserCard({ user }) {
             <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate(`/profile/${user.username}`)}
+                onClick={() => navigate(`/U/${user.username}`)}
             >
                 View
             </Button>

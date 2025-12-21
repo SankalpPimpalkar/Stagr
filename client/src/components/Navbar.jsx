@@ -1,9 +1,16 @@
 import { Link, NavLink, useNavigate } from "react-router";
 import { UserButton, useUser, useClerk } from "@clerk/clerk-react";
 import { Button } from "./ui/Button";
+import { useQuery } from "@tanstack/react-query";
+import { userAPI } from "../utils/api";
 
 export function Navbar() {
-    const { user } = useUser();
+    const { data: userData } = useQuery({
+        queryKey: ["currentUser"],
+        queryFn: () => userAPI.getCurrentUser(),
+        retry: false
+    })
+    console.log(userData?.user, 'Myuserss')
     const navigate = useNavigate();
 
     return (
@@ -18,9 +25,6 @@ export function Navbar() {
                     <NavLink to="/" className={({ isActive }) => `btn btn-sm btn-ghost ${isActive ? "bg-base-200" : ""}`}>Feed</NavLink>
                     <NavLink to="/explore" className={({ isActive }) => `btn btn-sm btn-ghost ${isActive ? "bg-base-200" : ""}`}>Explore</NavLink>
                     <NavLink to="/users" className={({ isActive }) => `btn btn-sm btn-ghost ${isActive ? "bg-base-200" : ""}`}>People</NavLink>
-                    {user?.username && (
-                        <NavLink to={`/profile/${user.username}`} className={({ isActive }) => `btn btn-sm btn-ghost ${isActive ? "bg-base-200" : ""}`}>Profile</NavLink>
-                    )}
                 </div>
 
                 <Button
@@ -39,9 +43,11 @@ export function Navbar() {
                 >
                     +
                 </button>
-
-                <UserButton afterSignOutUrl="/sign-in" />
-            </div>
+                {(userData?.user?.username) && (
+                    <NavLink to={`/profile/${userData?.user?.username}`} className={({ isActive }) => `btn btn-sm btn-ghost ${isActive ? "bg-base-200" : ""}`}>Profile</NavLink>
+                )}
+                {/* <UserButton afterSignOutUrl="/sign-in" /> */}
+            </div> 
         </nav>
     );
 }
