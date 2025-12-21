@@ -4,8 +4,8 @@ export function Avatar({ src, alt, size = "md", className }) {
     const sizes = {
         sm: "w-8 h-8",
         md: "w-12 h-12",
-        lg: "w-24 h-24",
-        xl: "w-32 h-32"
+        lg: "w-34 h-34",
+        xl: "w-44 h-44"
     };
 
     return (
