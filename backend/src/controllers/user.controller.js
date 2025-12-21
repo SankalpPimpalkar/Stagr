@@ -124,7 +124,7 @@ export async function getUserByUsername(req, res) {
                 })
         }
 
-        const user = await User.findOne({ username: regex })
+        const user = await User.findOne({ username: username.toLowerCase() })
             .select("name username imageUrl bio createdAt")
 
         return res

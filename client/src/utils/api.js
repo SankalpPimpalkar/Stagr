@@ -39,14 +39,8 @@ export const userAPI = {
         return data
     },
     getUserByUsername: async (username) => {
-        // Backend searchUsers is at /api/users?search=...
-        // We can simulate getByUsername by searching or asking backend dev for a specific route.
-        // For now, let's use search and filter or just search.
-        // If we strictly need by username, we might need to rely on the general search.
-        const { data } = await AXIOS.get("/users", { params: { search: username } })
-        // Assuming the backend returns a list, we pick the exact match if possible
-        const user = data.users.find(u => u.username === username);
-        return user || null;
+        const { data } = await AXIOS.get(`/users/u/${username}`)
+        return data.user
     },
     getCurrentUser: async () => {
         const { data } = await AXIOS.get("/users/me")
