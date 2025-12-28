@@ -107,6 +107,11 @@ export const storyAPI = {
         const { data } = await AXIOS.post(`/stories/${storyId}/like`);
         return data;
     },
+
+    getStoryById: async (storyId) => {
+        const { data } = await AXIOS.get(`/stories/${storyId}`);
+        return data;
+    },
 };
 
 export const tagAPI = {
@@ -137,4 +142,9 @@ export const tagAPI = {
         const { data } = await AXIOS.post(`/tags/${tagId}/like`);
         return data;
     },
+
+    // getAllTags: async (params = {}) => {
+    //     const { data } = await AXIOS.get("/tags", { params });
+    //     return data;
+    // },
 };
