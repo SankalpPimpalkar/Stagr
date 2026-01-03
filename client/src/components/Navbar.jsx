@@ -24,6 +24,7 @@ export function Navbar() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1 bg-base-200/50 p-1 rounded-full border border-base-content/5 backdrop-blur-md absolute left-1/2 -translate-x-1/2">
                 <NavPill to="/" icon="Home" label="Home" />
+                <NavPill to="/stories" icon="Book" label="Stories" />
                 <NavPill to="/explore" icon="Explore" label="Explore" />
                 <NavPill to="/users" icon="People" label="Find" />
             </div>
