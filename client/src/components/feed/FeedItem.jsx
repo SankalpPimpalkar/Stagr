@@ -59,7 +59,7 @@ export function FeedItem({ post }) {
 
             {/* Main Cinematic Stage */}
             <div
-                className="relative w-full aspect-[6/6] bg-base-200 rounded-3xl overflow-hidden shadow-lg transition-transform duration-500 hover:scale-[1.01]"
+                className="relative w-full aspect-6/6 bg-base-200 rounded-3xl overflow-hidden shadow-lg transition-transform duration-500 hover:scale-[1.01]"
                 onDoubleClick={handleDoubleTap}
             >
                 {/* Media */}

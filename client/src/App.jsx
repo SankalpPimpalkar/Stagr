@@ -22,6 +22,10 @@ export default function App() {
   useEffect(() => {
     // Register the token provider so api.js can fetch tokens securely
     registerTokenProvider(getToken);
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
   }, [getToken]);
 
   return (
