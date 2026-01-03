@@ -46,7 +46,7 @@ export function StoryDetail({ story }) {
 
             {/* Header / Cover */}
             <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-8">
-               hh {story?.story?.title}
+               {story?.story?.title}
             </h1>
 
             <div className="flex items-center justify-between mb-8 border-t border-b border-base-content/10 py-6">
