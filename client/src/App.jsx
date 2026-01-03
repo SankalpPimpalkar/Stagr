@@ -10,6 +10,9 @@ import Profile from "./pages/Profile"
 import Explore from "./pages/Explore"
 import NotFound from "./pages/NotFound"
 import CreatePost from "./pages/CreatePost"
+import StoriesPage from "./pages/StoriesPage"
+import StoryDetailPage from "./pages/StoryDetailPage"
+import CreateStoryPage from "./pages/CreateStoryPage"
 import { Navbar } from "./components/Navbar"
 import U from "./pages/U"
 
@@ -43,6 +46,9 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="explore" element={<Explore />} />
           <Route path="create-post" element={<CreatePost />} />
+          <Route path="stories" element={<StoriesPage />} />
+          <Route path="stories/:id" element={<StoryDetailPage />} />
+          <Route path="create-story" element={<CreateStoryPage />} />
         </Route>
       </Route>
 
