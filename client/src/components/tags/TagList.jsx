@@ -27,9 +27,9 @@ export function TagList({ tags, isLoading, emptyMessage = "No tags yet." }) {
 
     return (
         <div className="flex flex-col">
-            {/* {tags.map((tag) => (
+            {tags.map((tag) => (
                 <TagCard key={tag._id} tag={tag} />
-            ))} */}
+            ))}
         </div>
     );
 }

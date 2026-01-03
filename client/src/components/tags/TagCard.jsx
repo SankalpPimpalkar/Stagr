@@ -7,10 +7,10 @@ import { useCurrentUser } from "../../hooks/user";
 export function TagCard({ tag }) {
     const { user } = useCurrentUser();
     const queryClient = useQueryClient();
-    const isLiked = tag.likes?.includes(user?._id);
+    const isLiked = tag?.likes?.includes(user?._id);
 
     const likeMutation = useMutation({
-        mutationFn: () => tagAPI.toggleLikeTag(tag._id),
+        mutationFn: () => tagAPI.toggleLikeTag(tag?._id),
         onSuccess: () => {
             queryClient.invalidateQueries(["tags"]);
             queryClient.invalidateQueries(["stories"]); // In case it affects story view
@@ -28,8 +28,8 @@ export function TagCard({ tag }) {
         <div className="border-b border-base-content/10 py-4 hover:bg-base-200/50 transition-colors px-4 -mx-4">
             <div className="flex gap-3">
                 <Avatar
-                    src={tag.owner?.imageUrl}
-                    alt={tag.owner?.username}
+                    src={tag?.owner?.imageUrl}
+                    alt={tag?.owner?.username}
                     size="sm"
                     className="mt-1"
                 />
@@ -37,9 +37,9 @@ export function TagCard({ tag }) {
                 <div className="flex-1 min-w-0">
                     {/* Header */}
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-sm">{tag.owner?.username}</span>
-                        <span className="text-xs opacity-40">• {formatDate(tag.createdAt)}</span>
-                        {tag.story && (
+                        <span className="font-bold text-sm">{tag?.owner?.username}</span>
+                        <span className="text-xs opacity-40">• {formatDate(tag?.createdAt)}</span>
+                        {tag?.story && (
                             <span className="text-xs text-primary/70 bg-primary/10 px-1.5 rounded-full truncate max-w-[100px]">
                                 Re: Story
                             </span>
@@ -66,7 +66,7 @@ export function TagCard({ tag }) {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                                 </svg>
                             )}
-                            {tag.likes?.length || 0}
+                            {tag?.likes?.length || 0}
                         </button>
                     </div>
                 </div>
