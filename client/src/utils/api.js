@@ -148,3 +148,26 @@ export const tagAPI = {
     //     return data;
     // },
 };
+
+export const followAPI = {
+    followUser: async (userId) => {
+        const { data } = await AXIOS.post(`/follow/${userId}`);
+        return data;
+    },
+    unfollowUser: async (userId) => {
+        const { data } = await AXIOS.delete(`/follow/${userId}`);
+        return data;
+    },
+    getFollowers: async (userId) => {
+        const { data } = await AXIOS.get(`/follow/followers/${userId}`);
+        return data;
+    },
+    getFollowing: async (userId) => {
+        const { data } = await AXIOS.get(`/follow/following/${userId}`);
+        return data;
+    },
+    isFollowing: async (userId) => {
+        const { data } = await AXIOS.get(`/follow/is-following/${userId}`);
+        return data;
+    },
+};

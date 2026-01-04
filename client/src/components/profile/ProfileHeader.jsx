@@ -15,7 +15,18 @@ const getGradient = (username) => {
     return `bg-linear-to-r ${gradients[index]}`;
 };
 
-export function ProfileHeader({ user, isOwnProfile, onEditProfile, postCount }) {
+export function ProfileHeader({
+    user,
+    isOwnProfile,
+    onEditProfile,
+    postCount,
+    followersCount = 0,
+    followingCount = 0,
+    isFollowing = false,
+    onFollow,
+    onUnfollow,
+    isFollowLoading = false
+}) {
     if (!user) return null;
 
     const bannerGradient = getGradient(user.username);
@@ -67,6 +78,18 @@ export function ProfileHeader({ user, isOwnProfile, onEditProfile, postCount }) 
                                 @{user.username}
                             </p>
                         </div>
+
+                        {/* Follow Button */}
+                        {!isOwnProfile && (
+                            <Button
+                                variant={isFollowing ? "outline" : "primary"}
+                                onClick={isFollowing ? onUnfollow : onFollow}
+                                isLoading={isFollowLoading}
+                                className="min-w-[120px]"
+                            >
+                                {isFollowing ? "Unfollow" : "Follow"}
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -92,11 +115,15 @@ export function ProfileHeader({ user, isOwnProfile, onEditProfile, postCount }) 
                             <span className="text-xs uppercase tracking-widest text-base-content/50 font-semibold">Posts</span>
                         </div>
                         <div className="flex flex-col items-center md:items-end group cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
-                            <span className="text-2xl md:text-3xl font-black font-sans">0</span>
+                            <span className="text-2xl md:text-3xl font-black font-sans">
+                                {followersCount}
+                            </span>
                             <span className="text-xs uppercase tracking-widest text-base-content/50 font-semibold">Followers</span>
                         </div>
                         <div className="flex flex-col items-center md:items-end group cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
-                            <span className="text-2xl md:text-3xl font-black font-sans">0</span>
+                            <span className="text-2xl md:text-3xl font-black font-sans">
+                                {followingCount}
+                            </span>
                             <span className="text-xs uppercase tracking-widest text-base-content/50 font-semibold">Following</span>
                         </div>
                     </div>
