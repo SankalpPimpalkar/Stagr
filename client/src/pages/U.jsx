@@ -1,15 +1,17 @@
 import { useParams } from "react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useUser } from "@clerk/clerk-react";
-import { userAPI, postAPI } from "../utils/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCurrentUser } from "../hooks/user";
+import { userAPI, postAPI, followAPI } from "../utils/api";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { PostGrid } from "../components/profile/PostGrid";
 import { PostFeedOverlay } from "../components/profile/PostFeedOverlay";
 import { useState } from "react";
+import { Button } from "../components/ui/Button"; // If needed elsewhere, but Header handles the button
 
 export default function U() {
     const { username } = useParams();
-    const { user: currentUser } = useUser();
+    const queryClient = useQueryClient();
+    const { user: currentUser } = useCurrentUser();
 
     // Fetch User Details
     const { data: userProfile, isLoading: isUserLoading } = useQuery({
@@ -29,8 +31,67 @@ export default function U() {
     const [selectedIndex, setSelectedIndex] = useState(null);
 
     // Check if viewing own profile
-    // We match by username as it's visible in URL and profile
-    const isOwnProfile = currentUser?.username === username;
+    console.log("U.jsx - Current User:", currentUser);
+    console.log("U.jsx - Profile Username:", username);
+
+    const isOwnProfile = currentUser?.username?.toLowerCase() === username?.toLowerCase();
+    const profileUserId = userProfile?._id;
+
+    console.log("U.jsx - Profile User ID:", profileUserId);
+    console.log("U.jsx - Is Own Profile:", isOwnProfile);
+
+    // Fetch Followers
+    const { data: followersData } = useQuery({
+        queryKey: ["followers", profileUserId],
+        queryFn: () => followAPI.getFollowers(profileUserId),
+        enabled: !!profileUserId
+    });
+
+    // Fetch Following
+    const { data: followingData } = useQuery({
+        queryKey: ["following", profileUserId],
+        queryFn: () => followAPI.getFollowing(profileUserId),
+        enabled: !!profileUserId
+    });
+
+    // Check if following (only if not own profile)
+    const { data: isFollowingData } = useQuery({
+        queryKey: ["isFollowing", profileUserId],
+        queryFn: () => followAPI.isFollowing(profileUserId),
+        enabled: !!profileUserId && !!currentUser && !isOwnProfile
+    });
+
+    const followMutation = useMutation({
+        mutationFn: (id) => followAPI.followUser(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["followers", profileUserId]);
+            queryClient.invalidateQueries(["isFollowing", profileUserId]);
+            queryClient.invalidateQueries(["following", currentUser?._id]);
+        },
+        onError: (err) => console.error("Follow Error:", err)
+    });
+
+    const unfollowMutation = useMutation({
+        mutationFn: (id) => followAPI.unfollowUser(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["followers", profileUserId]);
+            queryClient.invalidateQueries(["isFollowing", profileUserId]);
+            queryClient.invalidateQueries(["following", currentUser?._id]);
+        },
+        onError: (err) => console.error("Unfollow Error:", err)
+    });
+
+    const handleFollow = () => {
+        if (!profileUserId) return console.error("No Profile ID");
+        console.log("Follow clicked for:", profileUserId);
+        followMutation.mutate(profileUserId);
+    };
+
+    const handleUnfollow = () => {
+        if (!profileUserId) return console.error("No Profile ID");
+        console.log("Unfollow clicked for:", profileUserId);
+        unfollowMutation.mutate(profileUserId);
+    };
 
     if (isUserLoading) return (
         <div className="flex justify-center items-center h-[50vh]">
@@ -53,8 +114,14 @@ export default function U() {
             <ProfileHeader
                 user={userProfile}
                 isOwnProfile={isOwnProfile}
-                onEditProfile={() => {/* Read only view usually, but technically shouldn't happen here if nav logic is correct */ }}
+                onEditProfile={() => {/* Read only view usually */ }}
                 postCount={posts.length}
+                followersCount={followersData?.count || 0}
+                followingCount={followingData?.count || 0}
+                isFollowing={isFollowingData?.isFollowing || false}
+                onFollow={handleFollow}
+                onUnfollow={handleUnfollow}
+                isFollowLoading={followMutation.isPending || unfollowMutation.isPending}
             />
 
             <div className="border-t border-base-content/10 mt-8 mb-8" />

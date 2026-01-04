@@ -34,25 +34,121 @@ export default function Profile() {
         }
     });
 
+    // Fetch User Profile to get ID
     const posts = postsData?.posts || [];
-    const isOwnProfile = currentUser?.username === username;
 
-    if (!currentUser) return (
+    // Debugging logs
+    console.log("Profile username param:", username);
+    console.log("Current User:", currentUser);
+
+    const isOwnProfile = currentUser?.username?.toLowerCase() === username?.toLowerCase();
+    console.log("isOwnProfile calculated:", isOwnProfile);
+
+    // Fetch User Profile if not own profile
+    const { data: fetchedUser, isLoading: isUserLoading } = useQuery({
+        queryKey: ["user", username],
+        queryFn: () => userAPI.getUserByUsername(username),
+        enabled: !!username && !isOwnProfile,
+    });
+
+    // Determine which user to display
+    // If own profile, use currentUser (which is already available)
+    // If other profile, use fetchedUser
+    // If data is still loading for other user, profileUser might be undefined temporarily
+    const profileUser = isOwnProfile ? currentUser : fetchedUser;
+
+    // Check if we have a valid profile user to show
+    const profileUserId = profileUser?._id;
+
+    console.log("Determined Profile User:", profileUser);
+    console.log("Profile User ID to use:", profileUserId);
+
+    // Fetch Followers
+    const { data: followersData } = useQuery({
+        queryKey: ["followers", profileUserId],
+        queryFn: () => followAPI.getFollowers(profileUserId),
+        enabled: !!profileUserId
+    });
+
+    // Fetch Following
+    const { data: followingData } = useQuery({
+        queryKey: ["following", profileUserId],
+        queryFn: () => followAPI.getFollowing(profileUserId),
+        enabled: !!profileUserId
+    });
+
+    // Check if following (only if not own profile)
+    const { data: isFollowingData } = useQuery({
+        queryKey: ["isFollowing", profileUserId],
+        queryFn: () => followAPI.isFollowing(profileUserId),
+        enabled: !!profileUserId && !!currentUser && !isOwnProfile
+    });
+
+    const followMutation = useMutation({
+        mutationFn: (id) => followAPI.followUser(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["followers", profileUserId]);
+            queryClient.invalidateQueries(["isFollowing", profileUserId]);
+            // Optional: invalidate currentUser's following count
+            queryClient.invalidateQueries(["following", currentUser?._id]);
+        },
+        onError: (error) => {
+            console.error("Follow mutation failed:", error);
+        }
+    });
+
+    const unfollowMutation = useMutation({
+        mutationFn: (id) => followAPI.unfollowUser(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["followers", profileUserId]);
+            queryClient.invalidateQueries(["isFollowing", profileUserId]);
+            queryClient.invalidateQueries(["following", currentUser?._id]);
+        },
+        onError: (error) => {
+            console.error("Unfollow mutation failed:", error);
+        }
+    });
+
+    const handleFollow = () => {
+        if (!profileUserId) return console.error("No profile ID");
+        console.log("Follow clicked. ID:", profileUserId);
+        followMutation.mutate(profileUserId);
+    };
+    const handleUnfollow = () => {
+        if (!profileUserId) return console.error("No profile ID");
+        console.log("Unfollow clicked. ID:", profileUserId);
+        unfollowMutation.mutate(profileUserId);
+    };
+
+    if (isPostsLoading || isUserLoading) return (
         <div className="flex justify-center items-center h-[50vh]">
             <span className="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+    );
+
+    if (!profileUser) return (
+        <div className="flex justify-center items-center h-[50vh] flex-col gap-4">
+            <h2 className="text-2xl font-bold">User not found</h2>
+            <p className="text-base-content/60">The user you are looking for does not exist.</p>
         </div>
     );
 
     return (
         <div className="max-w-4xl mx-auto py-8">
             <ProfileHeader
-                user={currentUser}
+                user={profileUser} // Use fetched profile user, not just currentUser
                 isOwnProfile={isOwnProfile}
                 onEditProfile={() => {
-                    setBio(currentUser.bio || "");
+                    setBio(profileUser.bio || "");
                     setIsEditBioOpen(true);
                 }}
                 postCount={posts.length}
+                followersCount={followersData?.count || 0}
+                followingCount={followingData?.count || 0}
+                isFollowing={isFollowingData?.isFollowing || false}
+                onFollow={handleFollow}
+                onUnfollow={handleUnfollow}
+                isFollowLoading={followMutation.isPending || unfollowMutation.isPending}
             />
 
             <div className="border-t border-base-content/10 mt-8 mb-8" />

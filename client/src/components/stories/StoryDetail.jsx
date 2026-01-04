@@ -9,20 +9,20 @@ import { useCurrentUser } from "../../hooks/user";
 export function StoryDetail({ story }) {
     const { user } = useCurrentUser();
     const queryClient = useQueryClient();
-
+    console.log(story, "000story");
     // Fetch tags for this story
     const { data: tags, isLoading: tagsLoading } = useQuery({
-        queryKey: ["story-tags", story._id],
-        queryFn: () => tagAPI.getTagsByStory(story._id),
-        enabled: !!story._id,
+        queryKey: ["story-tags", story?.story?._id],
+        queryFn: () => tagAPI.getTagsByStory(story?.story?._id),
+        enabled: !!story?.story?._id,
     });
-
-    const isLiked = story.likes?.includes(user?._id);
+    console.log(tags, "tags");
+    const isLiked = story?.story?.likes?.includes(user?._id);
 
     const likeMutation = useMutation({
-        mutationFn: () => storyAPI.toggleLikeStory(story._id),
+        mutationFn: () => storyAPI.toggleLikeStory(story?.story?._id),
         onSuccess: () => {
-            queryClient.invalidateQueries(["story", story._id]);
+            queryClient.invalidateQueries(["story", story?.story?._id]);
         }
     });
 
@@ -98,14 +98,14 @@ export function StoryDetail({ story }) {
 
             {/* Tags Section */}
             <div className="border-t border-base-content/10 pt-10">
-                <h3 className="text-xl font-bold mb-6">Thoughts ({tags?.length || 0})</h3>
+                <h3 className="text-xl font-bold mb-6">Thoughts ({tags?.tags?.length || 0})</h3>
 
                 <div className="mb-10">
-                    <TagInput storyId={story._id} />
+                    <TagInput storyId={story?.story?._id} />
                 </div>
 
                 <div className="ml-4 md:ml-0">
-                    <TagList tags={tags} isLoading={tagsLoading} emptyMessage="Be the first to share a thought." />
+                    <TagList tags={tags?.tags} isLoading={tagsLoading} emptyMessage="Be the first to share a thought." />
                 </div>
             </div>
         </div>
