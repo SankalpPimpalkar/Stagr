@@ -10,6 +10,7 @@ import postRouter from "./routes/post.routes.js";
 import userRouter from "./routes/user.routes.js";
 import storyRouter from "./routes/story.routes.js";
 import tagRouter from "./routes/tag.routes.js";
+import followRouter from "./routes/follow.routes.js";
 
 const app = express()
 const __dirname = path.resolve()
@@ -27,6 +28,7 @@ app.use("/api/inngest", serve({ client: INNGEST, functions, }));
 
 app.use("/api/users", userRouter)
 app.use("/api/posts", postRouter)
+app.use("/api/follow", followRouter)
 app.use("/api/stories", storyRouter)
 app.use("/api/tags", tagRouter)
 
