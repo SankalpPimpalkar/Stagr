@@ -13,6 +13,7 @@
     "@clerk/clerk-react": "^5.58.1",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-query": "^5.90.12",
+    "@xyflow/react": "^12.10.0",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
     "react": "^19.2.0",
