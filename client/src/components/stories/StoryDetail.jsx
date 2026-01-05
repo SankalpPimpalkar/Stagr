@@ -5,9 +5,11 @@ import { TagInput } from "../tags/TagInput";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { storyAPI, tagAPI } from "../../utils/api";
 import { useCurrentUser } from "../../hooks/user";
+import { useNavigate } from "react-router-dom";
 
 export function StoryDetail({ story }) {
     const { user } = useCurrentUser();
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     console.log(story, "000story");
     // Fetch tags for this story
@@ -33,7 +35,9 @@ export function StoryDetail({ story }) {
             year: "numeric"
         });
     };
-
+    const handleUserClick = (username) => {
+        navigate(`/u/${username}`);
+    };
     return (
         <div className="max-w-3xl mx-auto w-full pb-20 animate-in fade-in duration-500">
             {/* Back Navigation */}
@@ -50,7 +54,7 @@ export function StoryDetail({ story }) {
             </h1>
 
             <div className="flex items-center justify-between mb-8 border-t border-b border-base-content/10 py-6">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4" onClick={() => handleUserClick(story?.story?.owner?.username)}>
                     <Avatar
                         src={story?.story?.owner?.imageUrl}
                         alt={story?.story?.owner?.username}

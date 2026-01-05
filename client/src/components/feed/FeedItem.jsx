@@ -4,7 +4,7 @@ import { ImageCarousel } from "../ui/ImageCarousel";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postAPI } from "../../utils/api";
 import { useCurrentUser } from "../../hooks/user";
-
+import { useNavigate } from "react-router-dom";
 // Helper to format date
 const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -17,7 +17,7 @@ export function FeedItem({ post }) {
     const { user } = useCurrentUser();
     const queryClient = useQueryClient();
     const [showHeart, setShowHeart] = useState(false);
-
+    const navigate = useNavigate();
     const isLiked = post.likes?.includes(user?._id);
 
     const likeMutation = useMutation({
@@ -35,12 +35,15 @@ export function FeedItem({ post }) {
         setShowHeart(true);
         setTimeout(() => setShowHeart(false), 1000);
     };
-
+    const handleUserClick = (username) => {
+        navigate(`/u/${username}`);
+        onClose();
+    };
     return (
         <div className="group relative border border-base-content/10 rounded-3xl w-full mb-12 animate-in fade-in duration-700">
             {/* Context Header - Floating above */}
             <div className="flex items-center justify-between px-2 py-2 mb-6">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3" onClick={() => handleUserClick(post.owner?.username)}>
                     <Avatar
                         src={post.owner?.imageUrl}
                         alt={post.owner?.username}
@@ -48,7 +51,7 @@ export function FeedItem({ post }) {
                         className="ring-2 ring-base-100 ring-offset-2 ring-offset-base-100 shadow-md"
                     />
                     <div className="flex flex-col">
-                        <span className="font-bold text-base leading-none tracking-tight">{post.owner?.username}</span>
+                        <span className="font-bold text-base leading-none tracking-tight">{post.owner?.name}</span>
                         {post.location && <span className="text-xs opacity-60 font-serif italic">{post.location}</span>}
                     </div>
                 </div>
