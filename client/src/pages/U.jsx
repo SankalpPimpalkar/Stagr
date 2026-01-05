@@ -5,6 +5,7 @@ import { userAPI, postAPI, followAPI } from "../utils/api";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { PostGrid } from "../components/profile/PostGrid";
 import { PostFeedOverlay } from "../components/profile/PostFeedOverlay";
+import { UserListModal } from "../components/profile/UserListModal";
 import { useState } from "react";
 import { Button } from "../components/ui/Button"; // If needed elsewhere, but Header handles the button
 
@@ -29,6 +30,7 @@ export default function U() {
 
     const posts = postsData?.posts || [];
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const [activeList, setActiveList] = useState(null); // 'followers' | 'following' | null
 
     // Check if viewing own profile
     console.log("U.jsx - Current User:", currentUser);
@@ -46,7 +48,7 @@ export default function U() {
         queryFn: () => followAPI.getFollowers(profileUserId),
         enabled: !!profileUserId
     });
-
+    console.log(followersData, 'followersData')
     // Fetch Following
     const { data: followingData } = useQuery({
         queryKey: ["following", profileUserId],
@@ -122,6 +124,8 @@ export default function U() {
                 onFollow={handleFollow}
                 onUnfollow={handleUnfollow}
                 isFollowLoading={followMutation.isPending || unfollowMutation.isPending}
+                onFollowersClick={() => setActiveList('followers')}
+                onFollowingClick={() => setActiveList('following')}
             />
 
             <div className="border-t border-base-content/10 mt-8 mb-8" />
@@ -154,6 +158,16 @@ export default function U() {
                     onClose={() => setSelectedIndex(null)}
                 />
             )}
+
+            {/* User List Modal */}
+            <UserListModal
+                isOpen={!!activeList}
+                onClose={() => setActiveList(null)}
+                title={activeList === 'followers' ? 'Followers' : 'Following'}
+                followersData={followersData?.followers}
+                followingData={followingData?.following}
+                isLoading={activeList === 'followers' ? !followersData : !followingData}
+            />
         </div>
     );
 }
