@@ -25,7 +25,9 @@ export function ProfileHeader({
     isFollowing = false,
     onFollow,
     onUnfollow,
-    isFollowLoading = false
+    isFollowLoading = false,
+    onFollowersClick,
+    onFollowingClick
 }) {
     if (!user) return null;
 
@@ -114,13 +116,19 @@ export function ProfileHeader({
                             </span>
                             <span className="text-xs uppercase tracking-widest text-base-content/50 font-semibold">Posts</span>
                         </div>
-                        <div className="flex flex-col items-center md:items-end group cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
+                        <div
+                            className="flex flex-col items-center md:items-end group cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
+                            onClick={() => followersCount > 0 && onFollowersClick && onFollowersClick()}
+                        >
                             <span className="text-2xl md:text-3xl font-black font-sans">
                                 {followersCount}
                             </span>
                             <span className="text-xs uppercase tracking-widest text-base-content/50 font-semibold">Followers</span>
                         </div>
-                        <div className="flex flex-col items-center md:items-end group cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
+                        <div
+                            className="flex flex-col items-center md:items-end group cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
+                            onClick={() => followingCount > 0 && onFollowingClick && onFollowingClick()}
+                        >
                             <span className="text-2xl md:text-3xl font-black font-sans">
                                 {followingCount}
                             </span>

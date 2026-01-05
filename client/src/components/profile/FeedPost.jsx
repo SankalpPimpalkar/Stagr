@@ -37,7 +37,7 @@ export function FeedPost({ post }) {
                 <div className="flex items-center gap-3">
                     <Avatar src={post.owner?.imageUrl} alt={post.owner?.username} size="sm" />
                     <div>
-                        <h3 className="font-bold text-sm leading-none">{post.owner?.username}</h3>
+                        <h3 className="font-bold text-sm leading-none">{post.owner?.name}</h3>
                         <p className="text-xs text-base-content/50">{post.location || formatDate(post.createdAt)}</p>
                     </div>
                 </div>

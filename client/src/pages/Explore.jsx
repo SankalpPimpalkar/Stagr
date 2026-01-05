@@ -1,7 +1,9 @@
-import React from 'react'
+import ExploreGraph from "../components/explore/ExploreGraph";
 
 export default function Explore() {
     return (
-        <div>Explore</div>
-    )
+        <div className="w-full h-screen overflow-hidden">
+            <ExploreGraph />
+        </div>
+    );
 }

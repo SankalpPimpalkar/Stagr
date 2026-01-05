@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { userAPI, postAPI } from "../utils/api";
+import { userAPI, postAPI, followAPI } from "../utils/api";
 import { Modal } from "../components/ui/Modal";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
@@ -9,6 +9,7 @@ import { useCurrentUser } from "../hooks/user";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { PostGrid } from "../components/profile/PostGrid";
 import { PostFeedOverlay } from "../components/profile/PostFeedOverlay";
+import { UserListModal } from "../components/profile/UserListModal";
 
 export default function Profile() {
     const { username } = useParams();
@@ -36,7 +37,7 @@ export default function Profile() {
 
     // Fetch User Profile to get ID
     const posts = postsData?.posts || [];
-
+    const [activeList, setActiveList] = useState(null); 
     // Debugging logs
     console.log("Profile username param:", username);
     console.log("Current User:", currentUser);
@@ -76,6 +77,7 @@ export default function Profile() {
         queryFn: () => followAPI.getFollowing(profileUserId),
         enabled: !!profileUserId
     });
+console.log(followingData, 'followingData')
 
     // Check if following (only if not own profile)
     const { data: isFollowingData } = useQuery({
@@ -149,6 +151,8 @@ export default function Profile() {
                 onFollow={handleFollow}
                 onUnfollow={handleUnfollow}
                 isFollowLoading={followMutation.isPending || unfollowMutation.isPending}
+                onFollowersClick={() => setActiveList('followers')}
+                onFollowingClick={() => setActiveList('following')}
             />
 
             <div className="border-t border-base-content/10 mt-8 mb-8" />
@@ -221,6 +225,15 @@ export default function Profile() {
                     </div>
                 </div>
             </Modal>
+            {/* User List Modal */}
+            <UserListModal
+                isOpen={!!activeList}
+                onClose={() => setActiveList(null)}
+                title={activeList === 'followers' ? 'Followers' : 'Following'}
+                followersData={followersData?.followers}
+                followingData={followingData?.following}
+                isLoading={activeList === 'followers' ? !followersData : !followingData}
+            />
         </div>
     );
 }
